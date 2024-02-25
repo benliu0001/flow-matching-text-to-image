@@ -1,0 +1,52 @@
+\documentclass[12pt]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{multicol}
+
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{epsfig}
+\usepackage{color}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{setspace}
+\usepackage{subfigure}
+\usepackage{soul}
+\usepackage{mathrsfs,amsmath}
+
+\begin{document}
+\color{black}
+\begin{center}\textbf{\large CSC413 Project Proposal}\\\bigskip
+
+ {\bf Abhijoy Mandal; 1005714121
+  }
+\end{center}
+
+\noindent
+
+\section{Introduction}
+
+Deep generative models have seen a huge leap in popularity in recent years, particularly in high fidelity text-to-image generation ~\cite{ramesh2021zeroshot}. This has been facilitated mostly by diffusion models, which posses stable and scalable ways to train them ~\cite{NEURIPS2020_4c5bcfec}. These models however move through complicated probability paths during denoising, resulting in longer training and inference times. ~\cite{lipman2023flow}
+\\
+Continuous Normalizing Flows provide a way to model arbitrary probability paths, and recent advances in this line of work has led to the development of tractable and differentiable ways to train CNF based models. These models have shown the ability to outperform DDPM based models both in terms of quality of images (measure by FID) and in terms of speed of inference (measured by NFE) ~\cite{lipman2023flow}. While CNF models show impressive performance in unconditioned image sampling, their capabilities text conditioned sampling remains unexplored.
+\\
+In this project, we look to explore the possibility of conditioning flow matching models on text prompts as well as explore the zero-shot generation capabilities of such models.
+
+\section{Prior Works}
+\subsection{Zero-shot Text-to-Image}
+The problem of zero-shot text-to-image generation deals with generating high-fidelity images conditioned on text prompts, possibly unseen by the model. Diffusion models have shown impressive performance at this task outperfoming SOTA GAN models at generating realistic images, achieved by training on much larger datasets (such as LIAON-5B ~\cite{schuhmann2022laion}) consisting of image text pairs ~\cite{ramesh2021zeroshot, saharia2022photorealistic}. Following the initial success of diffusion models, several improvements had been made to reduce model size (latent diffusion ~\cite{rombach2022high}), improve image quality (cascaded diffusion ~\cite{ho2022cascaded}) and increase the modality of outputs (using VAE ~\cite{ramesh2021zeroshot}). All these methods, however, use diffusion models and CNFs remain largely unexplored in this field which provide an opportunity to further improve on existing architectures both in terms of speed and quality of images.
+
+\subsection{Generative Flow Matching}
+Flow matching algorithm follows from Continuous Normalising Flows, which aim to model the movement of the probability distribution (probability paths) by predicting vector fields which dictate how to move the probability distribution. In the case of image generation, we try to model the flow of probability of pixel values from noise to some image. However until late, most methods of training such models required expensive simulations of ODEs or involved intractable calculations hindering widespread use. Recent works in this field address this and have successfully managed to train Flow Mathcing networks for generative modelling, and have shown to outperform SOTA diffusion models in both quality and speed.~\cite{lipman2023flow}
+
+\section{Dataset and Model Architecture}
+Large scale text-to-image models have been traditionally trained on large datasets consisting of image-text pairs. One such popularly used dataset is the LAION-5B dataset, it contains 5 billion text-image pairs, of which we plan to use a subset due to the large space requirements. To also reduce model size, we will work in the 128x128 image space, as opposed to the 512x512 images provided in the dataset.
+
+The model consists of a text encoder and a flow matching U-net. We use a pre-trained CLIP ViT-16L as our text encoder as it is the same model used to generate the text encodings provided in the LIAON-5B dataset. The text-encoder is frozen during training as our main goal is to evaluate the use of flow matching instead of diffusion. Our goal is to successfully incorporate text embedding in flow matching, to achieve this, we explore with augmenting the timestep embeddings passed into the unet with the text embedding obtained from a pre-trained ViT-16L. We also explore the use of VQ-VAEs to achieve the goal of conditioning, where we train an intermediate model to predict a sequence of indices into an embedding dictionary which is decoded by the flow matching network.
+
+Finally, we evaluate the zero-shot generation capabilities of flow matching based generative models by reporting FID and NFE statistics (to measure fidelity and speed) of these models, and compare these to SOTA diffusion policies.
+
+\bibliography{Bibliography/Bibliography}
+\bibliographystyle{IEEEtran}
+
+\end{document}
